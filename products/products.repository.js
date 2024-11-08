@@ -86,7 +86,8 @@ const eliminarProductoPorId = async (pid) => {
     }
 }
 
-const seleccionarTodosLosProductos = async () => {
+
+/*const seleccionarTodosLosProductos = async () => {
     try {
         const seleccionarTodos = 'SELECT * FROM products'
         const resultadoSeleccionarTodos = await query(seleccionarTodos)
@@ -97,6 +98,39 @@ const seleccionarTodosLosProductos = async () => {
         }
         else {
             throw { status: 500, message: 'ERROR INTERNO EN LA BASE DE DATOS.' }
+        }
+    }
+}*/
+
+const seleccionarTodosLosProductos = async () => {
+    try {
+        const seleccionarTodos = 'SELECT p.id as product_id, p.title as product_title, p.brand as product_brand, p.price as product_price, i.id as image_id, i.imgSource as image_source FROM products p LEFT JOIN images i ON p.id = i.productid';
+        const resultadoSeleccionarTodos = await query(seleccionarTodos);
+        // Procesar los resultados para obtener el formato deseado
+        const products = [];
+        resultadoSeleccionarTodos.forEach(result => {
+            let existingProduct = products.find(p => p.id === result.product_id);
+            if (!existingProduct) {
+                existingProduct = {
+                    id: result.product_id,
+                    title: result.product_title,
+                    brand: result.product_brand,
+                    price: result.product_price,
+                    images: []
+                };
+                products.push(existingProduct);
+            }
+            existingProduct.images.push({
+                id: result.image_id,
+                imgSource: result.image_source
+            });
+        });
+        return products;
+    } catch (error) {
+        if (error.status === 404) {
+            throw error;
+        } else {
+            throw { status: 500, message: 'ERROR INTERNO EN LA BASE DE DATOS.' };
         }
     }
 }
