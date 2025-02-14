@@ -35,23 +35,19 @@ const getCartService = async (user_id) => {
 }
 
 const deleteProductFromCartService = async ({ user_id, product_id }) => {
-try {
-    const carrito = await crearCarrito(user_id)
-    await eliminarProductoDelCarrito(carrito.id, product_id)
-    const carritoDetallado = await obtenerCarritoDetallado(carrito.id)
-    return { status: 200, message: 'PRODUCTO ELIMINADO DEL CARRITO CORRECTAMENTE', carrito: carritoDetallado }
-} catch (error) {
-    if (error.status) {
-        throw error
+    try {
+        const carrito = await crearCarrito(user_id)
+        await eliminarProductoDelCarrito(carrito.id, product_id)
+        const carritoDetallado = await obtenerCarritoDetallado(carrito.id)
+        return { status: 200, message: 'PRODUCTO ELIMINADO DEL CARRITO CORRECTAMENTE', carrito: carritoDetallado }
+    } catch (error) {
+        if (error.status) {
+            throw error
+        }
+        else {
+            throw { status: 500, message: 'ERROR DESCONOCIDO.' }
+        }
     }
-    else {
-        throw { status: 500, message: 'ERROR DESCONOCIDO.' }
-    }
-}    
 }
 
 module.exports = { postCartsService, getCartService, deleteProductFromCartService }
-
-
-
-

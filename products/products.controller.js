@@ -1,5 +1,5 @@
 const { postProductService, getProductByIdService, deleteProductByIdService, getAllProductsService, putProductByIdService } = require('./products.service')
-const postProductController = async (req, res) => {//Este controlador va encargarse de recibir título, precio,descripción,stock,código y se lo va pasar al servicio del producto y el servicio se encargará de validar que el objeto recibido tenga las propiedades correspondientes
+const postProductController = async (req, res) => {//Este controlador va encargarse de recibir título,precio,descripción,stock,código y se lo va pasar al servicio del producto y el servicio se encargará de validar que el objeto recibido tenga las propiedades correspondientes
     //const { title, price, description, stock, codigo } = req.body
     try {
         const resultado = await postProductService(req.body)//tomo el body completo, osea, todas la propiedades del objeto, las propiedades necesarias y las no necesarias.
