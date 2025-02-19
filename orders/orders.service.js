@@ -9,7 +9,41 @@ const postOrdersService = async (datos) => {
         const orderId = await crearOrden({ order_no, order_date, status, delivery_date, payment_method, total });
         // Insertar los productos de la orden en la base de datos
         await agregarProductosAOrden(orderId, items);
-        return { status: 200, message: 'ORDEN CREADA CORRECTAMENTE.', orderId };
+        /*return {
+            status: 200,
+            message: 'ORDEN CREADA CORRECTAMENTE.',
+            id: orderId,
+            order_no: order_no,
+            order_date: order_date,
+            estado: status,//es "status: status", pero le pongo "estado: status" para que no genere conflicto con el "status: 200".
+            delivery_date: delivery_date,
+            payment_method: payment_method,
+            items: items
+        };*/
+        return {
+            status: 200,
+            message: 'ORDEN CREADA CORRECTAMENTE.',
+            orderData: [
+                {
+                    id: orderId,
+                    order_no: order_no,
+                    order_date: order_date,
+                    status: status, // No renombramos aquí para evitar confusión
+                    delivery_date: delivery_date || "Fecha de entrega no disponible",
+                    payment_method: payment_method,
+                    items: items
+                    /*items: items.map((item) => ({
+                        id: `product_${item.id}`,
+                        title: item.title,
+                        color: item.color,
+                        quantity: item.quantity,
+                        price: item.price,
+                        imgSource: item.imgSource
+                    }))*/
+                }
+            ]
+        };
+
     } catch (error) {
         if (error.status) {
             throw error;
