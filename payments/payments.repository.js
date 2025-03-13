@@ -1,27 +1,36 @@
 //PAYMENTS.REPOSITORY.JS
-const { MercadoPagoConfig, Payment } = require('mercadopago');
-// Configuración del cliente con el Access Token
-const client = new MercadoPagoConfig({ accessToken: 'TEST-4346990445233014-022509-2a0bc8ea1059c3495a98e7a4f6c81f33-58948365', options: { timeout: 5000, idempotencyKey: 'abc' } });
-const payment = new Payment(client);
+const { MercadoPagoConfig, Preference } = require('mercadopago');
+const MPConfig = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
+const preference = new Preference(MPConfig);
 
-const crearPago = async () => {
-  const body = {
-    transaction_amount: 100,
-    description: '',
-    payment_method_id: 'rapipago', // ID obtenido de la respuesta de Postman
-    payer: {
-      email: 'fbasualdo76@gmail.com'
-    }
+const crearPreferencia = async (productos) => {
+
+  const body = {//TIENE QUE LLAMARSE "body"
+    items: [
+      {
+        id: "item-ID-1234",
+        title: productos?.title || "Compra en mi tienda en backend",
+        quantity: 1,
+        unit_price: productos?.unit_price || 100,
+      }
+    ],
+    back_urls: {
+      success: "http://localhost:3000/success",
+      failure: "http://localhost:3000/failure",
+      pending: "http://localhost:3000/pending"
+    },
+    auto_return: "approved",
   };
 
   try {
-    const response = await payment.create({ body });
+    const response = await preference.create({ body });
     //console.log('Preferencia creada exitosamente:', response);
     return response;
   } catch (error) {
-    console.error('Error al crear la preferencia:', error.response ? error.response.data : error.message);
-    throw new Error('No se pudo crear la preferencia de pago.');
-  }
+    //console.error('Error al crear la preferencia:', error.response ? error.response.data : error.message);
+    throw new Error('NO SE PUDO CREAR LA PREFERENCIA DE PAGO.');
+  };
+
 };
 
-module.exports = { crearPago };
+module.exports = { crearPreferencia };

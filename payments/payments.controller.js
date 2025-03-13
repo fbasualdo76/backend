@@ -1,15 +1,17 @@
 //PAYMENTS.CONTROLLER.JS
-const { crearPago } = require("./payments.repository");
+const { crearPreferencia } = require("./payments.repository");
 
 const generarPreferencia = async (req, res) => {
   try {
     const productos = req.body;
-    const preferencia = await crearPago(productos);
-    //console.log('Preferencia recibida en el controller:', preferencia);
-    res.json({ preferenceId: preferencia?.id || 'ID no disponible' });
+    const preferencia = await crearPreferencia(productos);
+    // Devolvemos la preferencia con "EL CODIGO DE ESTADO HTTP" 200 (éxito)
+    res.status(200).json({
+      preferenceId: preferencia.id,
+    });
   } catch (error) {
-    console.error('Error al generar la preferencia:', error); // Mostrar el error completo
-    res.status(500).json({ error: 'No se pudo generar la preferencia de pago.' });
+    //console.error("Error al generar la preferencia:", error);
+    res.status(500).json({ error: "NO SE PUDO GENEREAR LA PREFERENCIA DE PAGO." });
   }
 };
 
