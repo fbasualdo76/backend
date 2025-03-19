@@ -1,3 +1,4 @@
+//ORDERS.SERVICE.JS
 const { crearOrden, agregarProductosAOrden } = require("./orders.repository")
 
 const postOrdersService = async (datos) => {
@@ -31,6 +32,7 @@ const postOrdersService = async (datos) => {
                     status: status, // No renombramos aquí para evitar confusión
                     delivery_date: delivery_date || "Fecha de entrega no disponible",
                     payment_method: payment_method,
+                    total: total,
                     items: items
                     /*items: items.map((item) => ({
                         id: `product_${item.id}`,

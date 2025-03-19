@@ -9,9 +9,9 @@ const crearPreferencia = async (productos) => {
     items: [
       {
         id: "item-ID-1234",
-        title: productos?.title || "Compra en mi tienda en backend",
+        title: productos?.title || "Compra en mi tienda (BACKEND)",
         quantity: 1,
-        unit_price: productos?.unit_price || 100,
+        unit_price: productos?.unit_price || 10,
       }
     ],
     back_urls: {
