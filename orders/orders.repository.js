@@ -1,13 +1,13 @@
 //ORDERS.REPOSITORY.JS
 const { query } = require("../config/connection.sql")
 
-const crearOrden = async ({ order_no, order_date, status, delivery_date, payment_method, total }) => {
+const crearOrden = async ({ date, order_status, payment_method, payment_status, total }) => {
     try {
         const insertarOrden = `
-            INSERT INTO orders (order_no, order_date, status, delivery_date, payment_method, total) 
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO orders (date, order_status, payment_method, payment_status, total) 
+            VALUES (?, ?, ?, ?, ?)
         `;
-        const valores = [order_no, order_date, status, delivery_date, payment_method, total];
+        const valores = [date, order_status, payment_method, payment_status, total];
         const resultado = await query(insertarOrden, valores);
         return resultado.insertId; // Devuelve el ID de la orden creada
     } catch (error) {
@@ -29,4 +29,19 @@ const agregarProductosAOrden = async (orderId, items) => {
         throw { status: 500, message: 'ERROR INTERNO EN LA BASE DE DATOS al agregar productos a la orden.' };
     }
 };
-module.exports = { crearOrden, agregarProductosAOrden }
+
+const actualizarOrden = async (orderId, payment_method, payment_status) => {//Actualiza el payment_method (forma de pago) y payment_status (estado de pago) de la orden.
+    try {
+        const actualizarQuery = `
+            UPDATE orders 
+            SET payment_method = ?, payment_status = ? 
+            WHERE id = ?
+        `;
+        const valores = [payment_method, payment_status, orderId];
+        await query(actualizarQuery, valores);
+    } catch (error) {
+        throw { status: 500, message: 'ERROR INTERNO EN LA BASE DE DATOS al actualizar la forma de pago y el estado de pago.' };
+    }
+};
+
+module.exports = { crearOrden, agregarProductosAOrden, actualizarOrden }
