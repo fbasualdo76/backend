@@ -10,7 +10,7 @@ const generarPreferencia = async (req, res) => {
       preferenceId: preferencia.id,
     });
   } catch (error) {
-    //console.error("Error al generar la preferencia:", error);
+    console.error("Error al generar la preferencia:", error);
     res.status(500).json({ error: "NO SE PUDO GENEREAR LA PREFERENCIA DE PAGO." });
   }
 };
