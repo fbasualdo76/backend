@@ -1,3 +1,4 @@
+//PRODUCTS.SERVICE.JS
 const { insertarProducto, seleccionarProductoPorId, eliminarProductoPorId, seleccionarTodosLosProductos, modificarProductoPorId } = require("./products.repository");
 const { validarProducto } = require("./utils/validation.Product.Util")
 

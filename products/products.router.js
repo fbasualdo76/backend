@@ -1,3 +1,4 @@
+//PRODUCTS.ROUTER.JS
 const express = require('express')
 const { postProductController, getProductByIdController, deleteProductByIdController, getAllProductsController, putProductByIdController, getAllProductsPaginationController } = require('./products.controller')
 const { verifyTokenMiddleware } = require('../auth/auth.middleware')

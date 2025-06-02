@@ -1,3 +1,4 @@
+//PRODUCTS.CONTROLLER.JS
 const { postProductService, getProductByIdService, deleteProductByIdService, getAllProductsService, putProductByIdService } = require('./products.service')
 const postProductController = async (req, res) => {//Este controlador va encargarse de recibir título,precio,descripción,stock,código y se lo va pasar al servicio del producto y el servicio se encargará de validar que el objeto recibido tenga las propiedades correspondientes
     //const { title, price, description, stock, codigo } = req.body
