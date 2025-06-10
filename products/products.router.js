@@ -1,6 +1,6 @@
 //PRODUCTS.ROUTER.JS
 const express = require('express')
-const { postProductController, getProductByIdController, deleteProductByIdController, getAllProductsController, putProductByIdController, getAllProductsPaginationController } = require('./products.controller')
+const { postProductController, getProductByIdController, deleteProductByIdController, getAllProductsController, putProductByIdController, getAllProductsPaginationController, getProductsByCategoryController } = require('./products.controller')
 const { verifyTokenMiddleware } = require('../auth/auth.middleware')
 
 const productsRouter = express.Router()
@@ -26,5 +26,7 @@ productsRouter.put('/:pid', putProductByIdController)
 productsRouter.delete('/:pid', deleteProductByIdController)
 
 productsRouter.get('/:pid', getProductByIdController)
+
+productsRouter.get("/category/:categoryId", getProductsByCategoryController);//obtiene los productos por categoria.
 
 module.exports = { productsRouter }

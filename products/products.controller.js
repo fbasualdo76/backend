@@ -1,5 +1,5 @@
 //PRODUCTS.CONTROLLER.JS
-const { postProductService, getProductByIdService, deleteProductByIdService, getAllProductsService, putProductByIdService } = require('./products.service')
+const { postProductService, getProductByIdService, deleteProductByIdService, getAllProductsService, putProductByIdService, getProductsByCategoryService } = require('./products.service')
 const postProductController = async (req, res) => {//Este controlador va encargarse de recibir título,precio,descripción,stock,código y se lo va pasar al servicio del producto y el servicio se encargará de validar que el objeto recibido tenga las propiedades correspondientes
     //const { title, price, description, stock, codigo } = req.body
     try {
@@ -25,6 +25,24 @@ const getProductByIdController = async (req, res) => {
     }
 
 }
+
+const getProductsByCategoryController = async (req, res) => {
+    try {
+        const { categoryId } = req.params;
+
+        if (!categoryId) {
+            return res.status(400).json({ message: 'FALTA EL PARAMETRO CATEGORY_ID' });
+        }
+
+        const productos = await getProductsByCategoryService(categoryId);
+        res.status(200).json({ status: 200, products: productos });
+    } catch (error) {
+        console.error("Error en getProductsByCategoryController:", error);
+        res.status(error.status || 500).json({
+            message: error.message || 'ERROR AL OBTENER LOS PRODUCTOS POR CATEGORIA.',
+        });
+    }
+};
 
 const deleteProductByIdController = async (req, res) => {
     try {
@@ -68,24 +86,24 @@ const putProductByIdController = async (req, res) => {
 
 const getAllProductsPaginationController = async (req, res) => {
     try {
-      const page = parseInt(req.query.page) || 1;
-      const limit = 3;
-      const startIndex = (page - 1) * limit;
-      const endIndex = page * limit;
-  
-      const products = await getAllProductsService();
-      const paginatedProducts = products.slice(startIndex, endIndex);
-  
-      const response = {
-        products: paginatedProducts,
-        page: page,
-        next: products.length > endIndex ? page + 1 : null,
-        prev: page > 1 ? page - 1 : null
-      };
-  
-      res.status(200).json(response);
+        const page = parseInt(req.query.page) || 1;
+        const limit = 3;
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
+
+        const products = await getAllProductsService();
+        const paginatedProducts = products.slice(startIndex, endIndex);
+
+        const response = {
+            products: paginatedProducts,
+            page: page,
+            next: products.length > endIndex ? page + 1 : null,
+            prev: page > 1 ? page - 1 : null
+        };
+
+        res.status(200).json(response);
     } catch (error) {
-      res.status(error.status).json(error);
+        res.status(error.status).json(error);
     }
-  }
-module.exports = { postProductController, getProductByIdController, deleteProductByIdController, getAllProductsController, putProductByIdController, getAllProductsPaginationController }
+}
+module.exports = { postProductController, getProductByIdController, deleteProductByIdController, getAllProductsController, putProductByIdController, getAllProductsPaginationController, getProductsByCategoryController }

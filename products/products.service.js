@@ -1,5 +1,5 @@
 //PRODUCTS.SERVICE.JS
-const { insertarProducto, seleccionarProductoPorId, eliminarProductoPorId, seleccionarTodosLosProductos, modificarProductoPorId } = require("./products.repository");
+const { insertarProducto, seleccionarProductoPorId, eliminarProductoPorId, seleccionarTodosLosProductos, modificarProductoPorId, seleccionarProductosPorCategoria } = require("./products.repository");
 const { validarProducto } = require("./utils/validation.Product.Util")
 
 const postProductService = async (producto) => {//En el servicio recibo el producto.
@@ -60,6 +60,20 @@ const getAllProductsService = async () => {
     }
 }
 
+const getProductsByCategoryService = async (categoryId) => {
+    try {
+        return await seleccionarProductosPorCategoria(categoryId);
+    } catch (error) {
+        if (error.status) throw error;
+
+        throw {
+            status: 500,
+            message: 'ERROR AL OBTENER LOS PRODUCTOS POR CATEGORIA',
+            origin: 'SERVICE',
+        };
+    }
+};
+
 const putProductByIdService = async (pid, producto) => {
     try {
         validarProducto(producto)
@@ -74,4 +88,4 @@ const putProductByIdService = async (pid, producto) => {
         }
     }
 }
-module.exports = { postProductService, getProductByIdService, deleteProductByIdService, getAllProductsService, putProductByIdService }
+module.exports = { postProductService, getProductByIdService, deleteProductByIdService, getAllProductsService, putProductByIdService, getProductsByCategoryService }

@@ -328,6 +328,120 @@ const seleccionarProductoPorId = async (pid) => {
     }
 }
 
+const seleccionarProductosPorCategoria = async (categoryId) => {
+    try {
+        const sql = `
+      SELECT 
+          p.id AS product_id,
+          p.title AS product_title,
+          p.brand AS product_brand,
+          p.price AS product_price,
+          p.rating AS product_rating,
+          p.comments_count AS product_comments_count,
+
+          -- imágenes
+          i.id AS image_id,
+          i.imgSource AS image_source,
+
+          -- categorías
+          c.id AS category_id,
+          c.category_name AS category_name,
+
+          -- variantes
+          pv.id AS variant_id,
+          pv.stock AS variant_stock,
+          col.id AS color_id,
+          col.color_name AS color_name,
+          col.color_code AS color_code,
+          s.id AS size_id,
+          s.size_name AS size_name
+
+      FROM products p
+
+      INNER JOIN product_category pc ON pc.product_id = p.id
+      INNER JOIN categories c ON c.id = pc.category_id AND c.id = ? -- <== FILTRO
+
+      -- imágenes y variantes
+      LEFT JOIN product_variant pv ON pv.product_id = p.id
+      LEFT JOIN images i ON i.product_variant_id = pv.id
+
+      -- color y talle
+      LEFT JOIN colors col ON col.id = pv.color_id
+      LEFT JOIN sizes s ON s.id = pv.size_id
+    `;
+
+        const results = await query(sql, [categoryId]);
+
+        if (!results.length) {
+            throw {
+                status: 404,
+                message: 'NO SE ENCONTRARON PRODUCTOS PARA ESTA CATEGORIA.',
+                origin: 'REPOSITORY',
+            };
+        }
+
+        const products = [];
+
+        results.forEach(row => {
+            let product = products.find(p => p.id === row.product_id);
+            if (!product) {
+                product = {
+                    id: row.product_id,
+                    title: row.product_title,
+                    brand: row.product_brand,
+                    price: row.product_price,
+                    rating: row.product_rating,
+                    comments_count: row.product_comments_count,
+                    images: [],
+                    categories: [],
+                    variant: []
+                };
+                products.push(product);
+            }
+
+            if (row.image_id && !product.images.find(img => img.id === row.image_id)) {
+                product.images.push({
+                    id: row.image_id,
+                    imgSource: row.image_source
+                });
+            }
+
+            if (row.category_id && !product.categories.find(cat => cat.id === row.category_id)) {
+                product.categories.push({
+                    id: row.category_id,
+                    name: row.category_name
+                });
+            }
+
+            if (row.variant_id && !product.variant.find(v => v.id === row.variant_id)) {
+                product.variant.push({
+                    id: row.variant_id,
+                    stock: row.variant_stock,
+                    color: {
+                        id: row.color_id,
+                        name: row.color_name,
+                        code: row.color_code
+                    },
+                    size: {
+                        id: row.size_id,
+                        name: row.size_name
+                    }
+                });
+            }
+        });
+
+        return products;
+
+    } catch (error) {
+        if (error.status) throw error;
+        throw {
+            status: 500,
+            message: 'ERROR EN LA BASE DE DATOS AL OBTENER PRODUCTOS POR CATEGORIA .',
+            origin: 'REPOSITORY'
+        };
+    }
+};
+
 const insertarProducto = async ({ titulo, imagen, descripcion, stock, precio, codigo }) => {
     try {
         const insertar = 'INSERT INTO productos (titulo,imagen,descripcion,stock,precio,codigo) VALUES (?,?,?,?,?,?)'
@@ -385,4 +499,4 @@ const eliminarProductoPorId = async (pid) => {
     }
 }
 
-module.exports = { insertarProducto, seleccionarProductoPorId, eliminarProductoPorId, seleccionarTodosLosProductos, modificarProductoPorId }
+module.exports = { insertarProducto, seleccionarProductoPorId, eliminarProductoPorId, seleccionarTodosLosProductos, modificarProductoPorId, seleccionarProductosPorCategoria }
