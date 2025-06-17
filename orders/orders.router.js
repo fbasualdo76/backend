@@ -4,13 +4,13 @@ const { postOrdersController, putOrdersController } = require('./orders.controll
 const { verifyTokenMiddleware } = require('../auth/auth.middleware')
 
 const ordersRouter = express.Router()
+
 /*
-/api/carts
+/api/orders
 
 post: /
 get: /
 */
-//TODO: AGREGAR MIDDLEWARE DE VERIFICACIÓN DE TOKEN.
 
 ordersRouter.get('/', /*verifyTokenMiddleware,getOrdersController */)
 //El middleware verifica que se envíe el token, sino va a responder con error, si todo esta bien, va a ejecutar el controlador.

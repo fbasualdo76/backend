@@ -21,9 +21,13 @@ app.get('/test', (req, res) => {
 })
 
 app.use('/api/auth', authRouter)//indico la ruta que va utilizar el authRouter. Que mi aplicación utilice la ruta `api/auth` con los endpoints que estan en el auth.router.js
+
 app.use('/api/products', productsRouter)//indico la ruta que va utilizar el productsRouter. Que mi aplicación utilice la ruta `api/products` con los endpoints que estan en el products.router.js
+
 app.use('/api/carts', cartsRouter)//indico la ruta que va utilizar el cartsRouter. Que mi aplicación utilice la ruta `api/carts` con los endpoints que estan en el carts.router.js
+
 app.use('/api/orders', ordersRouter)//indico la ruta que va utilizar el ordersRouter. Que mi aplicación utilice la ruta `api/orders` con los endpoints que estan en el orders.router.js
+
 app.use('/api/payments', paymentsRouter)//indico la ruta que va utilizar el paymentsRouter. Que mi aplicación utilice la ruta `api/payments` con los endpoints que estan en el payments.router.js
 
 app.use('/api/categories', categoriesRouter)//indico la ruta que va utilizar el categoriesRouter. Que mi aplicación utilice la ruta `api/categories` con los endpoints que estan en el categories.router.js

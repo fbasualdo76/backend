@@ -4,9 +4,9 @@ const { verifyTokenMiddleware } = require('../auth/auth.middleware')
 
 const categoriesRouter = express.Router()
 
-//TODO: AGREGAR MIDDLEWARE DE VERIFICACIÓN DE TOKEN.
-
-//api/categories
+/*
+/api/categories
+*/
 
 categoriesRouter.get('/', getAllCategoriesController)
 

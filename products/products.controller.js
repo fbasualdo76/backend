@@ -19,7 +19,7 @@ const getProductByIdController = async (req, res) => {
         }
 
         const resultado = await getProductByIdService(pid)
-        res.status(200).json(resultado)
+        //res.status(200).json(resultado)
     } catch (error) {
         res.status(error.status).json(error)
     }

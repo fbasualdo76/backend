@@ -4,6 +4,7 @@ const { postProductController, getProductByIdController, deleteProductByIdContro
 const { verifyTokenMiddleware } = require('../auth/auth.middleware')
 
 const productsRouter = express.Router()
+
 /*
 /api/products
 
@@ -13,7 +14,6 @@ put actualizar producto: /
 delete eliminar producto: /
 get by id: /:pid
 */
-//TODO: AGREGAR MIDDLEWARE DE VERIFICACIÓN DE TOKEN.
 
 productsRouter.get('/', getAllProductsController)
 
