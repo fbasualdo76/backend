@@ -18,10 +18,13 @@ const getProductByIdController = async (req, res) => {
             throw { status: 400, message: 'EL ID DEBE SER UN NÚMERO.' }
         }
 
-        const resultado = await getProductByIdService(pid)
-        //res.status(200).json(resultado)
+        const producto = await getProductByIdService(pid)
+        res.status(200).json({ status: 200, product: producto });
     } catch (error) {
-        res.status(error.status).json(error)
+        console.error("Error en getProductByIdController:", error);
+        res.status(error.status || 500).json({
+            message: error.message || 'ERROR AL OBTENER EL PRODUCTO.',
+        });
     }
 
 }

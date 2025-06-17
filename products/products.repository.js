@@ -286,7 +286,7 @@ const seleccionarProductoPorId = async (pid) => {
                 title: resultadoSeleccionar[0].product_title,
                 brand: resultadoSeleccionar[0].product_brand,
                 price: resultadoSeleccionar[0].product_price,
-                rating: 4.5,
+                rating: resultadoSeleccionar[0].product_rating,
                 comments_count: 100,
                 images: [],
                 sizes: [],
