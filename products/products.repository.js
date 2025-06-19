@@ -66,105 +66,81 @@ const seleccionarTodosLosProductos_VERSION_CORTA = async () => {//Funcion corta 
 
 const seleccionarTodosLosProductos = async () => {//Funcion extendida de seleccionarTodosLosProductos. Trae todas las imagenes, categorias y variantes.
     try {
-        const sql = `
+        const seleccionar = `
             SELECT 
-                p.id AS product_id,
-                p.title AS product_title,
-                p.brand AS product_brand,
-                p.price AS product_price,
-                p.rating AS product_rating,
-                p.comments_count AS product_comments_count,
-
-                -- imágenes
-                i.id AS image_id,
-                i.imgSource AS image_source,
-
-                -- categorías
-                c.id AS category_id,
-                c.category_name AS category_name,
-
-                -- variantes
-                pv.id AS variant_id,
-                pv.stock AS variant_stock,
-                col.id AS color_id,
-                col.color_name AS color_name,
-                col.color_code AS color_code,
-                s.id AS size_id,
-                s.size_name AS size_name
+                p.id as product_id,
+                p.title as product_title,
+                p.brand as product_brand,
+                p.price as product_price,
+                p.rating as product_rating,
+                p.comments_count as product_comments_count,
+                
+                i.id as image_id,
+                i.imgSource as image_source,
+                
+                s.size_name as size_name,
+                c.color_name as color_name,
+                c.color_code as color_code,
+                
+                cat.id as category_id,
+                cat.category_name as category_name
 
             FROM products p
-
-            -- imágenes
-            LEFT JOIN product_variant pv ON pv.product_id = p.id
+            LEFT JOIN product_variant pv ON p.id = pv.product_id
+            LEFT JOIN sizes s ON pv.size_id = s.id
+            LEFT JOIN colors c ON pv.color_id = c.id
             LEFT JOIN images i ON i.product_variant_id = pv.id
-
-            -- categorías
-            LEFT JOIN product_category pc ON pc.product_id = p.id
-            LEFT JOIN categories c ON c.id = pc.category_id
-
-            -- color y talle de variantes
-            LEFT JOIN colors col ON col.id = pv.color_id
-            LEFT JOIN sizes s ON s.id = pv.size_id
+            LEFT JOIN product_category pc ON p.id = pc.product_id
+            LEFT JOIN categories cat ON pc.category_id = cat.id
+            ORDER BY p.id
         `;
 
-        const results = await query(sql);
+        const resultados = await query(seleccionar);
 
         const products = [];
 
-        results.forEach(row => {
-            let product = products.find(p => p.id === row.product_id);
+        resultados.forEach(result => {
+            let product = products.find(p => p.id === result.product_id);
             if (!product) {
                 product = {
-                    id: row.product_id,
-                    title: row.product_title,
-                    brand: row.product_brand,
-                    price: row.product_price,
-                    rating: row.product_rating,
-                    comments_count: row.product_comments_count,
+                    id: result.product_id,
+                    title: result.product_title,
+                    brand: result.product_brand,
+                    price: result.product_price,
+                    rating: result.product_rating,
+                    comments_count: result.product_comments_count,
                     images: [],
-                    categories: [],
-                    variant: []
+                    sizes: [],
+                    colors: [],
+                    categories: []
                 };
                 products.push(product);
             }
 
-            // Imágenes
-            if (row.image_id && !product.images.find(img => img.id === row.image_id)) {
-                product.images.push({
-                    id: row.image_id,
-                    imgSource: row.image_source
-                });
+            // imágenes
+            if (result.image_id && !product.images.find(img => img.id === result.image_id)) {
+                product.images.push({ id: result.image_id, imgSource: result.image_source });
             }
 
-            // Categorías
-            if (row.category_id && !product.categories.find(cat => cat.id === row.category_id)) {
-                product.categories.push({
-                    id: row.category_id,
-                    name: row.category_name
-                });
+            // talles
+            if (result.size_name && !product.sizes.includes(result.size_name)) {
+                product.sizes.push(result.size_name);
             }
 
-            // Variantes
-            if (row.variant_id && !product.variant.find(v => v.id === row.variant_id)) {
-                product.variant.push({
-                    id: row.variant_id,
-                    stock: row.variant_stock,
-                    color: {
-                        id: row.color_id,
-                        name: row.color_name,
-                        code: row.color_code
-                    },
-                    size: {
-                        id: row.size_id,
-                        name: row.size_name
-                    }
-                });
+            // colores
+            if (result.color_code && !product.colors.find(c => c.code === result.color_code)) {
+                product.colors.push({ name: result.color_name, code: result.color_code });
+            }
+
+            // categorías
+            if (result.category_id && !product.categories.find(cat => cat.id === result.category_id)) {
+                product.categories.push({ id: result.category_id, name: result.category_name });
             }
         });
 
         return products;
-
-    } catch (error) {
+    }
+    catch (error) {
         throw { status: 500, message: 'ERROR AL OBTENER PRODUCTOS CON DETALLE COMPLETO.' };
     }
 };
@@ -331,102 +307,84 @@ const seleccionarProductoPorId = async (pid) => {
 const seleccionarProductosPorCategoria = async (categoryId) => {
     try {
         const sql = `
-      SELECT 
-          p.id AS product_id,
-          p.title AS product_title,
-          p.brand AS product_brand,
-          p.price AS product_price,
-          p.rating AS product_rating,
-          p.comments_count AS product_comments_count,
+            SELECT 
+                p.id AS product_id,
+                p.title AS product_title,
+                p.brand AS product_brand,
+                p.price AS product_price,
+                p.rating AS product_rating,
+                p.comments_count AS product_comments_count,
 
-          -- imágenes
-          i.id AS image_id,
-          i.imgSource AS image_source,
+                i.id AS image_id,
+                i.imgSource AS image_source,
 
-          -- categorías
-          c.id AS category_id,
-          c.category_name AS category_name,
+                s.size_name AS size_name,
+                c.color_name AS color_name,
+                c.color_code AS color_code,
 
-          -- variantes
-          pv.id AS variant_id,
-          pv.stock AS variant_stock,
-          col.id AS color_id,
-          col.color_name AS color_name,
-          col.color_code AS color_code,
-          s.id AS size_id,
-          s.size_name AS size_name
+                cat.id AS category_id,
+                cat.category_name AS category_name
 
-      FROM products p
+            FROM products p
+            INNER JOIN product_category pc ON pc.product_id = p.id
+            INNER JOIN categories cat ON cat.id = pc.category_id AND cat.id = ?
 
-      INNER JOIN product_category pc ON pc.product_id = p.id
-      INNER JOIN categories c ON c.id = pc.category_id AND c.id = ? -- <== FILTRO
+            LEFT JOIN product_variant pv ON p.id = pv.product_id
+            LEFT JOIN sizes s ON pv.size_id = s.id
+            LEFT JOIN colors c ON pv.color_id = c.id
+            LEFT JOIN images i ON i.product_variant_id = pv.id
 
-      -- imágenes y variantes
-      LEFT JOIN product_variant pv ON pv.product_id = p.id
-      LEFT JOIN images i ON i.product_variant_id = pv.id
+            ORDER BY p.id
+        `;
 
-      -- color y talle
-      LEFT JOIN colors col ON col.id = pv.color_id
-      LEFT JOIN sizes s ON s.id = pv.size_id
-    `;
+        const resultados = await query(sql, [categoryId]);
 
-        const results = await query(sql, [categoryId]);
-
-        if (!results.length) {
+        if (!resultados.length) {
             throw {
                 status: 404,
-                message: 'NO SE ENCONTRARON PRODUCTOS PARA ESTA CATEGORIA.',
+                message: 'NO SE ENCONTRARON PRODUCTOS PARA ESTA CATEGORÍA.',
                 origin: 'REPOSITORY',
             };
         }
 
         const products = [];
 
-        results.forEach(row => {
-            let product = products.find(p => p.id === row.product_id);
+        resultados.forEach(result => {
+            let product = products.find(p => p.id === result.product_id);
             if (!product) {
                 product = {
-                    id: row.product_id,
-                    title: row.product_title,
-                    brand: row.product_brand,
-                    price: row.product_price,
-                    rating: row.product_rating,
-                    comments_count: row.product_comments_count,
+                    id: result.product_id,
+                    title: result.product_title,
+                    brand: result.product_brand,
+                    price: result.product_price,
+                    rating: result.product_rating,
+                    comments_count: result.product_comments_count,
                     images: [],
-                    categories: [],
-                    variant: []
+                    sizes: [],
+                    colors: [],
+                    categories: []
                 };
                 products.push(product);
             }
 
-            if (row.image_id && !product.images.find(img => img.id === row.image_id)) {
-                product.images.push({
-                    id: row.image_id,
-                    imgSource: row.image_source
-                });
+            // imágenes
+            if (result.image_id && !product.images.find(img => img.id === result.image_id)) {
+                product.images.push({ id: result.image_id, imgSource: result.image_source });
             }
 
-            if (row.category_id && !product.categories.find(cat => cat.id === row.category_id)) {
-                product.categories.push({
-                    id: row.category_id,
-                    name: row.category_name
-                });
+            // talles
+            if (result.size_name && !product.sizes.includes(result.size_name)) {
+                product.sizes.push(result.size_name);
             }
 
-            if (row.variant_id && !product.variant.find(v => v.id === row.variant_id)) {
-                product.variant.push({
-                    id: row.variant_id,
-                    stock: row.variant_stock,
-                    color: {
-                        id: row.color_id,
-                        name: row.color_name,
-                        code: row.color_code
-                    },
-                    size: {
-                        id: row.size_id,
-                        name: row.size_name
-                    }
-                });
+            // colores
+            if (result.color_code && !product.colors.find(c => c.code === result.color_code)) {
+                product.colors.push({ name: result.color_name, code: result.color_code });
+            }
+
+            // categorías
+            if (result.category_id && !product.categories.find(cat => cat.id === result.category_id)) {
+                product.categories.push({ id: result.category_id, name: result.category_name });
             }
         });
 
@@ -436,11 +394,12 @@ const seleccionarProductosPorCategoria = async (categoryId) => {
         if (error.status) throw error;
         throw {
             status: 500,
-            message: 'ERROR EN LA BASE DE DATOS AL OBTENER PRODUCTOS POR CATEGORIA .',
+            message: 'ERROR EN LA BASE DE DATOS AL OBTENER PRODUCTOS POR CATEGORÍA.',
             origin: 'REPOSITORY'
         };
     }
 };
+
 
 const insertarProducto = async ({ titulo, imagen, descripcion, stock, precio, codigo }) => {
     try {
